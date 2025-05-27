@@ -1,73 +1,93 @@
 package main
 
 import (
-	"errors"
 	"fmt"
-	"math"
 )
 
-const IMTPower = 2
+type stringMap = map[string]string
+
+var marks = stringMap{}
 
 func main() {
+Menu:
 	for {
-		fmt.Println("__ Калькулятор индекса массы тела __ ")
-		userWeight, userHeight := getUserInput()
-		IMT, err := calculateIMT(userWeight, userHeight)
-		if err != nil {
-			fmt.Println(err)
-			continue
+		viewMenu()
+		menuKey := scanMenu()
+		if menuKey <= 0 || menuKey >= 4 {
+			break Menu
 		}
-		outputResult(IMT)
-		if !breakeApp() {
-			break
-		}
-	}
 
+	}
 }
 
-func outputResult(IMT float64) {
-	switch {
-	case IMT < 16:
-		fmt.Println("У вас сильный дефицит массы тела")
-	case IMT < 18.5:
-		fmt.Println("У вас дефицит массы тела")
-	case IMT < 25:
-		fmt.Println("У вас нормальная масса тела")
-	case IMT < 30:
-		fmt.Println("У вас избыточная масса тела")
-	case IMT < 35:
-		fmt.Println("У вас 1-я степень ожирения")
-	case IMT < 40:
-		fmt.Println("У вас 2-я степень ожирения")
+func viewMenu() (key int) {
+	fmt.Println("1. Посмотреть закладки")
+	fmt.Println("2. Добавить закладку")
+	fmt.Println("3. Удалить закладку")
+	fmt.Println("4. Выход")
+	return
+}
+
+func scanMenu() (key int) {
+	fmt.Scan(&key)
+	switch key {
+	case 1:
+		lookMarks(marks)
+	case 2:
+		addMark(marks)
+	case 3:
+		deleteMark()
 	default:
-		fmt.Println("У вас 3-я степень ожирения")
+		break
 	}
-	result := fmt.Sprintf("Ваш индекс массы тела: %.0f\n", IMT)
-	fmt.Print(result)
+	return
 }
 
-func calculateIMT(userWeight float64, userHeight float64) (IMT float64, err error) {
-	if userWeight <= 0 || userHeight <= 0 {
-		return 0, errors.New("Не указан вес или рост")
+func lookMarks(m stringMap) {
+	if len(m) == 0 {
+		fmt.Println("Список закладок пуст")
+		return
 	}
-	IMT = userWeight / math.Pow(userHeight/100, IMTPower)
-	return IMT, nil
+	for key, value := range m {
+		fmt.Println(key, ":", value)
+	}
 }
 
-func getUserInput() (userHeight float64, userWeight float64) {
-	fmt.Println("Введите свой рост(см):")
-	fmt.Scan(&userHeight)
-	fmt.Println("Введите свой вес:")
-	fmt.Scan(&userWeight)
-	return userWeight, userHeight
+func addMark(m stringMap) {
+	var newKey string
+	var newDisc string
+	fmt.Println("Введите название закладки")
+	fmt.Scan(&newKey)
+	if !checkDuplicate(newKey, marks) {
+		fmt.Println("Введите описание")
+		fmt.Scan(&newDisc)
+		m[newKey] = newDisc
+		fmt.Printf("Закладка %v успещно создана \n", newKey)
+	} else {
+		fmt.Println("Закладка уже создана")
+	}
 }
 
-func breakeApp() bool {
-	var answerForCalc string
-	fmt.Println("Хотите рассчитать индекс повторно? y/n")
-	fmt.Scan(&answerForCalc)
-	if answerForCalc == "y" || answerForCalc == "Y" {
-		return true
+func checkDuplicate(newKey string, m stringMap) bool {
+	var check bool
+	for key, _ := range m {
+		if key == newKey {
+			check = true
+		} else {
+			check = false
+		}
 	}
-	return false
+	return check
+}
+
+func deleteMark() {
+	var newKey string
+	fmt.Println("Введите название закладки для удаления")
+	fmt.Scan(&newKey)
+	if checkDuplicate(newKey, marks) {
+		delete(marks, newKey)
+		fmt.Printf("Закладка %v успешно удалена \n", newKey)
+	} else {
+		fmt.Println("Такой закладки не существует, проверьте список закладок клавишой 1")
+	}
 }
