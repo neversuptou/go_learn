@@ -2,92 +2,55 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 )
 
-type stringMap = map[string]string
-
-var marks = stringMap{}
+// В цикле спросить о транзакциях, число -10, 10,40.5 добавлять в массив и вывести
 
 func main() {
-Menu:
+	transactions := []float64{}
+	var result float64
+
+	fmt.Println("Подсчет баланса: ")
+
+	transactions, result = loopInputTransactions()
+
+	outputResult(transactions, result)
+}
+
+func calculateResult(transactions []float64) float64 {
+	var result float64
+	for _, value := range transactions {
+		result += value
+	}
+	return result
+}
+
+func breakeApp(word string) (breaked bool, trans float64) {
+	num, err := strconv.ParseFloat(word, 64)
+	if err == nil {
+		return true, num
+	}
+
+	return false, 0.0
+}
+
+func loopInputTransactions() (transactions []float64, result float64) {
+	var word string
 	for {
-		viewMenu()
-		menuKey := scanMenu()
-		if menuKey <= 0 || menuKey >= 4 {
-			break Menu
+		fmt.Println("Напиши число или любой символ для подведения итога")
+		fmt.Scan(&word)
+		breaked, transaction := breakeApp(word)
+		if !breaked {
+			break
 		}
-
+		transactions = append(transactions, transaction)
+		result = calculateResult(transactions)
 	}
+	return transactions, result
 }
 
-func viewMenu() (key int) {
-	fmt.Println("1. Посмотреть закладки")
-	fmt.Println("2. Добавить закладку")
-	fmt.Println("3. Удалить закладку")
-	fmt.Println("4. Выход")
-	return
-}
-
-func scanMenu() (key int) {
-	fmt.Scan(&key)
-	switch key {
-	case 1:
-		lookMarks(marks)
-	case 2:
-		addMark(marks)
-	case 3:
-		deleteMark()
-	default:
-		break
-	}
-	return
-}
-
-func lookMarks(m stringMap) {
-	if len(m) == 0 {
-		fmt.Println("Список закладок пуст")
-		return
-	}
-	for key, value := range m {
-		fmt.Println(key, ":", value)
-	}
-}
-
-func addMark(m stringMap) {
-	var newKey string
-	var newDisc string
-	fmt.Println("Введите название закладки")
-	fmt.Scan(&newKey)
-	if !checkDuplicate(newKey, marks) {
-		fmt.Println("Введите описание")
-		fmt.Scan(&newDisc)
-		m[newKey] = newDisc
-		fmt.Printf("Закладка %v успещно создана \n", newKey)
-	} else {
-		fmt.Println("Закладка уже создана")
-	}
-}
-
-func checkDuplicate(newKey string, m stringMap) bool {
-	var check bool
-	for key, _ := range m {
-		if key == newKey {
-			check = true
-		} else {
-			check = false
-		}
-	}
-	return check
-}
-
-func deleteMark() {
-	var newKey string
-	fmt.Println("Введите название закладки для удаления")
-	fmt.Scan(&newKey)
-	if checkDuplicate(newKey, marks) {
-		delete(marks, newKey)
-		fmt.Printf("Закладка %v успешно удалена \n", newKey)
-	} else {
-		fmt.Println("Такой закладки не существует, проверьте список закладок клавишой 1")
-	}
+func outputResult(transactions []float64, result float64) {
+	fmt.Printf("Ваш баланс: %0.1f\n", result)
+	fmt.Println(transactions)
 }
