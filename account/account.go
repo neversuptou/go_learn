@@ -3,6 +3,7 @@ package account
 import (
 	"errors"
 	"fmt"
+	"github.com/fatih/color"
 	"learnGO/utils"
 	"math/rand"
 	"net/url"
@@ -53,41 +54,38 @@ func NewAccount(login, password, urlString string) (*AccountStruct, error) {
 	return newAcc, nil
 }
 
-func FindAccount() {
-	//зАпрашиваем URL
-	//делаем метод, который по url находит аккаунты
-	//strings contained
-	// вывод
-	urlString := utils.PromptData("Напишите url доступы которого хотите найти: ")
-	findAccountByURL(urlString)
+func FindAccount(vault *VaultWithDB) {
+	if len(vault.Accounts) == 0 {
+		utils.PrintError("Accounts not created")
+		return
+	}
+	urlString := utils.PromptData("Enter url of the account you want to find: ")
+	foundAccounts := vault.FindAccountByURL(urlString)
+	if len(foundAccounts) == 0 {
+		utils.PrintError("Accounts not found with url: " + urlString)
+		return
+	}
+	for _, v := range foundAccounts {
+		output(&v, "Account: ")
+	}
 }
 
-func DeleteAccount() *AccountStruct {
-	urlString := utils.PromptData("Напишите url доступы которого хотите удалить: ")
+func DeleteAccount(vault *VaultWithDB) {
+	if len(vault.Accounts) == 0 {
+		utils.PrintError("Accounts not created")
+		return
+	}
+	urlString := utils.PromptData("Enter url of the account you want to delete: ")
+	vault.UpdatedAt = time.Now()
 
-	found := false
-	for i, v := range accountArray {
-		if v.UrlString == urlString {
-			accountArray = append(accountArray[:i], accountArray[i+1:]...)
-			found = true
-			break
-		}
+	if !vault.deleteAccountByURL(urlString) {
+		utils.PrintError("Account not found")
+		return
 	}
-	if !found {
-		fmt.Println("Аккаунт не найден")
-	} else {
-		fmt.Println("Аккаунт удален")
-	}
-	//file, err := ArrayToBytes(accountArray)
-	//if err != nil {
-	//	fmt.Println("Не удалось преобразовать в JSON")
-	//	return nil
-	//}
-	//files.SaveFile(file, "data.json")
-	return nil
+	color.Green("Account deleted successfully")
 }
 
-func CreateAccount() {
+func CreateAccount(vault *VaultWithDB) {
 	login := utils.PromptData("Enter your login: ")
 	password := utils.PromptData("Enter your Password: ")
 	urlString := utils.PromptData("Enter your URL: ")
@@ -98,8 +96,14 @@ func CreateAccount() {
 		return
 	}
 
-	vault := NewVault()
 	vault.addAccount(*dataAccount)
 
-	fmt.Printf("Аккаунт успешно сохранён: \nЛогин: %s\nПароль: %s\nURL: %s\n", dataAccount.Login, dataAccount.Password, dataAccount.UrlString)
+	output(dataAccount, "Account saved successfully:")
+}
+
+func output(acc *AccountStruct, text string) {
+	color.Cyan(text)
+	color.Cyan("Login: " + acc.Login)
+	color.Cyan("Password: " + acc.Password)
+	color.Cyan("URL:" + acc.UrlString)
 }

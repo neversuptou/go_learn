@@ -3,6 +3,7 @@ package utils
 import (
 	"bufio"
 	"fmt"
+	"github.com/fatih/color"
 	"os"
 	"strings"
 )
@@ -16,6 +17,20 @@ func PromptData(prompt string) string {
 
 func CheckError(err error) {
 	if err != nil {
-		fmt.Println(err)
+		PrintError(err.Error())
 	}
+}
+
+func PrintError(value any) {
+	switch t := value.(type) {
+	case string:
+		color.Red(t)
+	case int:
+		color.Red("Код ошибки: %d", t)
+	case error:
+		color.Red(t.Error())
+	default:
+		color.Red("Unknown error")
+	}
+
 }
