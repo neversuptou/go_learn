@@ -1,7 +1,6 @@
 package files
 
 import (
-	"fmt"
 	"learnGO/utils"
 	"os"
 )
@@ -14,17 +13,14 @@ func SaveFile(content []byte, fileName string) {
 	_, err = file.Write(content)
 	utils.CheckError(err)
 
-	fmt.Println("File saved")
-
 	return
 }
-func ReadFile() {
-	file, err := os.Open("data.json")
+func ReadFile(name string) ([]byte, error) {
+	_, err := os.Open(name)
 	utils.CheckError(err)
 
-	defer file.Close()
 	data, err := os.ReadFile("data.json")
 	utils.CheckError(err)
 
-	fmt.Println(string(data))
+	return data, nil
 }

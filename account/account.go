@@ -1,12 +1,10 @@
 package account
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"learnGO/files"
 	"learnGO/utils"
-	"math/rand/v2"
+	"math/rand"
 	"net/url"
 	"time"
 )
@@ -21,35 +19,15 @@ type AccountStruct struct {
 
 var accountArray = []AccountStruct{}
 
-func (acc AccountStruct) OutputData() {
-	fmt.Printf("Аккаунт успешно сохранён: \nЛогин: %s\nПароль: %s\nURL: %s\n", acc.Login, acc.Password, acc.UrlString)
-}
-
 func (acc *AccountStruct) generatePassword(n int) {
 	letters := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@-_")
 	arr := make([]rune, n)
 
 	for i := range arr {
-		arr[i] = letters[rand.IntN(len(letters))]
+		arr[i] = letters[rand.Intn(len(letters))]
 	}
 	acc.Password = string(arr)
 }
-
-func (acc *AccountStruct) ToBytes() ([]byte, error) {
-	file, err := json.Marshal(acc)
-	if err != nil {
-		return nil, err
-	}
-	return file, nil
-}
-
-//func (acc *AccountStruct) FromBytes() ([]byte, error) {
-//	file, err := json.Unmarshal(acc)
-//	if err != nil {
-//		return nil, err
-//	}
-//	return file, nil
-//}
 
 func NewAccount(login, password, urlString string) (*AccountStruct, error) {
 	if login == "" {
@@ -100,7 +78,12 @@ func DeleteAccount() *AccountStruct {
 	} else {
 		fmt.Println("Аккаунт удален")
 	}
-
+	//file, err := ArrayToBytes(accountArray)
+	//if err != nil {
+	//	fmt.Println("Не удалось преобразовать в JSON")
+	//	return nil
+	//}
+	//files.SaveFile(file, "data.json")
 	return nil
 }
 
@@ -109,18 +92,14 @@ func CreateAccount() {
 	password := utils.PromptData("Enter your Password: ")
 	urlString := utils.PromptData("Enter your URL: ")
 
-	// This creates the account and handles password generation if needed
 	dataAccount, err := NewAccount(login, password, urlString)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	file, err := dataAccount.ToBytes()
-	if err != nil {
-		fmt.Println("Не удалось преобразовать в JSON")
-		return
-	}
-	files.SaveFile(file, "data.json")
 
-	dataAccount.OutputData()
+	vault := NewVault()
+	vault.addAccount(*dataAccount)
+
+	fmt.Printf("Аккаунт успешно сохранён: \nЛогин: %s\nПароль: %s\nURL: %s\n", dataAccount.Login, dataAccount.Password, dataAccount.UrlString)
 }
