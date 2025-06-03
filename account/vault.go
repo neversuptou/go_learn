@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/fatih/color"
 	"learnGO/utils"
-	"strings"
 	"time"
 )
 
@@ -72,10 +71,11 @@ func (vault *Vault) ToBytes() ([]byte, error) {
 	return file, nil
 }
 
-func (vault *VaultWithDB) FindAccountByURL(urlString string) []AccountStruct {
+func (vault *VaultWithDB) FindAccounts(str string, checker func(AccountStruct, string) bool) []AccountStruct {
 	var foundAccounts []AccountStruct
 	for _, v := range vault.Accounts {
-		isMatched := strings.Contains(v.UrlString, urlString)
+		//isMatched := strings.Contains(v.UrlString, urlString)
+		isMatched := checker(v, str)
 		if isMatched {
 			foundAccounts = append(foundAccounts, v)
 		}

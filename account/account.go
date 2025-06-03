@@ -7,6 +7,7 @@ import (
 	"learnGO/utils"
 	"math/rand"
 	"net/url"
+	"strings"
 	"time"
 )
 
@@ -54,18 +55,36 @@ func NewAccount(login, password, urlString string) (*AccountStruct, error) {
 	return newAcc, nil
 }
 
-func FindAccount(vault *VaultWithDB) {
+func FindAccountWithUrl(vault *VaultWithDB) {
 	if len(vault.Accounts) == 0 {
 		utils.PrintError("Accounts not created")
 		return
 	}
-	urlString := utils.PromptData("Enter url of the account you want to find: ")
-	foundAccounts := vault.FindAccountByURL(urlString)
-	if len(foundAccounts) == 0 {
-		utils.PrintError("Accounts not found with url: " + urlString)
+	urlString := utils.PromptData([]string{"Enter url of the account you want to find: "})
+	foundAccounts := vault.FindAccounts(urlString, func(acc AccountStruct, str string) bool {
+		return strings.Contains(acc.UrlString, str)
+	})
+	outPutAccounts(&foundAccounts, urlString)
+}
+
+func FindAccountWithLogin(vault *VaultWithDB) {
+	if len(vault.Accounts) == 0 {
+		utils.PrintError("Accounts not created")
 		return
 	}
-	for _, v := range foundAccounts {
+	login := utils.PromptData([]string{"Enter login of the account you want to find: "})
+	foundAccounts := vault.FindAccounts(login, func(acc AccountStruct, str string) bool {
+		return strings.Contains(acc.Login, str)
+	})
+	outPutAccounts(&foundAccounts, login)
+}
+
+func outPutAccounts(foundAccounts *[]AccountStruct, str string) {
+	if len(*foundAccounts) == 0 {
+		utils.PrintError("Accounts not found with login: " + str)
+		return
+	}
+	for _, v := range *foundAccounts {
 		output(&v, "Account: ")
 	}
 }
@@ -75,7 +94,7 @@ func DeleteAccount(vault *VaultWithDB) {
 		utils.PrintError("Accounts not created")
 		return
 	}
-	urlString := utils.PromptData("Enter url of the account you want to delete: ")
+	urlString := utils.PromptData([]string{"Enter url of the account you want to delete: "})
 	vault.UpdatedAt = time.Now()
 
 	if !vault.deleteAccountByURL(urlString) {
@@ -86,9 +105,9 @@ func DeleteAccount(vault *VaultWithDB) {
 }
 
 func CreateAccount(vault *VaultWithDB) {
-	login := utils.PromptData("Enter your login: ")
-	password := utils.PromptData("Enter your Password: ")
-	urlString := utils.PromptData("Enter your URL: ")
+	login := utils.PromptData([]string{"Enter your login: "})
+	password := utils.PromptData([]string{"Enter your Password: "})
+	urlString := utils.PromptData([]string{"Enter your URL: "})
 
 	dataAccount, err := NewAccount(login, password, urlString)
 	if err != nil {

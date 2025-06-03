@@ -8,9 +8,15 @@ import (
 	"strings"
 )
 
-func PromptData(prompt string) string {
+func PromptData[typeOfSlice any](prompts []typeOfSlice) string {
 	reader := bufio.NewReader(os.Stdin)
-	fmt.Print(prompt)
+	for i, prompt := range prompts {
+		if i == len(prompts)-1 {
+			fmt.Printf("%s: ", prompt)
+		} else {
+			fmt.Println(prompt)
+		}
+	}
 	res, _ := reader.ReadString('\n')
 	return strings.TrimSpace(res)
 }
