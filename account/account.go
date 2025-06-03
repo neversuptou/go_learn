@@ -60,7 +60,7 @@ func FindAccountWithUrl(vault *VaultWithDB) {
 		utils.PrintError("Accounts not created")
 		return
 	}
-	urlString := utils.PromptData([]string{"Enter url of the account you want to find: "})
+	urlString := utils.PromptData("Enter url of the account you want to find: ")
 	foundAccounts := vault.FindAccounts(urlString, func(acc AccountStruct, str string) bool {
 		return strings.Contains(acc.UrlString, str)
 	})
@@ -72,7 +72,7 @@ func FindAccountWithLogin(vault *VaultWithDB) {
 		utils.PrintError("Accounts not created")
 		return
 	}
-	login := utils.PromptData([]string{"Enter login of the account you want to find: "})
+	login := utils.PromptData("Enter login of the account you want to find: ")
 	foundAccounts := vault.FindAccounts(login, func(acc AccountStruct, str string) bool {
 		return strings.Contains(acc.Login, str)
 	})
@@ -94,7 +94,7 @@ func DeleteAccount(vault *VaultWithDB) {
 		utils.PrintError("Accounts not created")
 		return
 	}
-	urlString := utils.PromptData([]string{"Enter url of the account you want to delete: "})
+	urlString := utils.PromptData("Enter url of the account you want to delete: ")
 	vault.UpdatedAt = time.Now()
 
 	if !vault.deleteAccountByURL(urlString) {
@@ -105,9 +105,9 @@ func DeleteAccount(vault *VaultWithDB) {
 }
 
 func CreateAccount(vault *VaultWithDB) {
-	login := utils.PromptData([]string{"Enter your login: "})
-	password := utils.PromptData([]string{"Enter your Password: "})
-	urlString := utils.PromptData([]string{"Enter your URL: "})
+	login := utils.PromptData("Enter your login: ")
+	password := utils.PromptData("Enter your Password: ")
+	urlString := utils.PromptData("Enter your URL: ")
 
 	dataAccount, err := NewAccount(login, password, urlString)
 	if err != nil {

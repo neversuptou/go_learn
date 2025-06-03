@@ -13,19 +13,20 @@ var menu = map[string]func(*account.VaultWithDB){
 	"4": account.DeleteAccount,
 }
 
+var menuVariants = []string{
+	"1. Create account",
+	"2. Find account by url",
+	"3. Find account by login",
+	"4. Delete",
+	"5. Exit",
+}
+
 func ChooseMenu() (breaked bool) {
 	//vault := account.NewVault(cloud.NewCloudDB("https://vk.com"))
 	vault := account.NewVault(files.NewJsonDB("data.json"))
 	for {
-		variant := []string{"1. Create account",
-			"2. Find account by url",
-			"3. Find account by login",
-			"4. Delete",
-			"5. Exit",
-			"Choose option ",
-		}
-		choosed := utils.PromptData(variant)
-		menuFunc := menu[choosed]
+		variant := utils.PromptData(menuVariants...)
+		menuFunc := menu[variant]
 		if menuFunc == nil {
 			return true
 		}

@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func PromptData[typeOfSlice any](prompts []typeOfSlice) string {
+func PromptData(prompts ...string) string {
 	reader := bufio.NewReader(os.Stdin)
 	for i, prompt := range prompts {
 		if i == len(prompts)-1 {
