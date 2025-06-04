@@ -3,6 +3,7 @@ package account
 import (
 	"encoding/json"
 	"github.com/fatih/color"
+	"learnGO/encrypter"
 	"learnGO/utils"
 	"time"
 )
@@ -24,20 +25,24 @@ type Vault struct {
 }
 type VaultWithDB struct {
 	Vault
-	db Db
+	db  Db
+	enc encrypter.Encrypter
 }
 
-func NewVault(db Db) *VaultWithDB {
+func NewVault(db Db, enc encrypter.Encrypter) *VaultWithDB {
 	file, err := db.Read()
-	if err != nil {
+	if err != nil || len(file) == 0 {
 		return &VaultWithDB{
 			Vault: Vault{
 				Accounts:  []AccountStruct{},
 				UpdatedAt: time.Now(),
 			},
-			db: db,
+			db:  db,
+			enc: enc,
 		}
 	}
+
+	file = enc.Decrypt(file)
 
 	var vault Vault
 	err = json.Unmarshal(file, &vault)
@@ -48,12 +53,15 @@ func NewVault(db Db) *VaultWithDB {
 				Accounts:  []AccountStruct{},
 				UpdatedAt: time.Now(),
 			},
-			db: db,
+			db:  db,
+			enc: enc,
 		}
 	}
+
 	return &VaultWithDB{
 		Vault: vault,
 		db:    db,
+		enc:   enc,
 	}
 }
 
@@ -102,5 +110,6 @@ func (vault *VaultWithDB) save() {
 	if err != nil {
 		color.Red(err.Error())
 	}
+	file = vault.enc.Encrypt(file)
 	vault.db.Write(file)
 }

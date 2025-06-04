@@ -2,6 +2,7 @@ package menu
 
 import (
 	"learnGO/account"
+	"learnGO/encrypter"
 	"learnGO/files"
 	"learnGO/utils"
 )
@@ -23,7 +24,7 @@ var menuVariants = []string{
 
 func ChooseMenu() (breaked bool) {
 	//vault := account.NewVault(cloud.NewCloudDB("https://vk.com"))
-	vault := account.NewVault(files.NewJsonDB("data.json"))
+	vault := account.NewVault(files.NewJsonDB("data.vault"), *encrypter.NewEncrypter())
 	for {
 		variant := utils.PromptData(menuVariants...)
 		menuFunc := menu[variant]

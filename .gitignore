@@ -1,4 +1,5 @@
 .idea/*
 learnGO.exe
 learnGO.exe~
-data.json
+/*.vault
+/*.env

@@ -27,7 +27,8 @@ func (db *JsonDB) Write(content []byte) {
 }
 func (db *JsonDB) Read() ([]byte, error) {
 	data, err := os.ReadFile(db.fileName)
-	utils.CheckError(err)
-
+	if err != nil {
+		return nil, err
+	}
 	return data, nil
 }
