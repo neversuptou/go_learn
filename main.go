@@ -18,6 +18,10 @@ func main() {
 		return
 	}
 
-	getWeather := weather.GetWeather(*geoData, *format)
+	getWeather, err := weather.GetWeather(*geoData, *format)
+	if err != nil {
+		color.Red(err.Error())
+		return
+	}
 	fmt.Println(getWeather)
 }
